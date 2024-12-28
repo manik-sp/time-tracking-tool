@@ -1,19 +1,29 @@
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96 text-center">
-        <h1 className="text-2xl font-bold mb-6">Welcome to Time Tracker</h1>
-        <div className="space-y-4">
-          <Link href="/signup" className="block w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-200">
-            Sign Up
-          </Link>
-          <Link href="/login" className="block w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition duration-200">
-            Login
-          </Link>
-        </div>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <Card className="w-[350px]">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center text-primary">TimeTracking Pro</CardTitle>
+          <CardDescription className="text-center">Professional time tracking solution by Digibiz</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-center text-muted-foreground">
+            Efficiently manage your time and boost productivity with our advanced time tracking tool.
+          </p>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-2">
+          <Button asChild className="w-full">
+            <Link href="/signup">Sign Up</Link>
+          </Button>
+          <Button asChild variant="outline" className="w-full">
+            <Link href="/login">Login</Link>
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   )
 }

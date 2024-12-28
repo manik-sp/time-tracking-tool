@@ -8,28 +8,25 @@ generator client {
 }
 
 model User {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  name        String?
-  role        Role     @default(EMPLOYEE)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  timeEntries TimeEntry[]
-
-  @@map("users")
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  role          Role      @default(EMPLOYEE)
+  avatar_url    String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  timeEntries   TimeEntry[]
 }
 
 model TimeEntry {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
+  id          String   @id @default(cuid())
+  userId      String
   user        User     @relation(fields: [userId], references: [id])
-  startTime   DateTime @map("start_time")
-  endTime     DateTime? @map("end_time")
+  startTime   DateTime
+  endTime     DateTime?
   description String?
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  @@map("time_entries")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 enum Role {
@@ -37,3 +34,4 @@ enum Role {
   ADMIN
   EMPLOYEE
 }
+

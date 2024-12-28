@@ -3,12 +3,12 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
-  const { id, email, name } = await request.json()
+  const { id, email, name, avatar_url } = await request.json()
   const supabase = createRouteHandlerClient({ cookies })
 
   const { data, error } = await supabase
-    .from('users')
-    .upsert({ id, email, name, role: 'EMPLOYEE' }, { onConflict: 'id' })
+    .from('user_profiles')
+    .upsert({ id, email, name, role: 'EMPLOYEE', avatar_url }, { onConflict: 'id' })
     .select()
     .single()
 
