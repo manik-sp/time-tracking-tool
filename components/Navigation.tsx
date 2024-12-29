@@ -13,6 +13,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { User, Calendar, BarChart2, Settings } from 'lucide-react'
+import { motion } from 'framer-motion'
+
+const AnimatedLink = motion(Link)
 
 const Navigation = ({ role, user }: { role: string; user: { name: string; email: string; avatar_url?: string } }) => {
   return (
@@ -26,29 +29,59 @@ const Navigation = ({ role, user }: { role: string; user: { name: string; email:
               </Link>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <Link href="/dashboard" className="border-primary text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <AnimatedLink
+                href="/dashboard"
+                className="border-primary text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 Dashboard
-              </Link>
-              <Link href="/weekly-view" className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              </AnimatedLink>
+              <AnimatedLink
+                href="/weekly-view"
+                className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 Weekly View
-              </Link>
-              <Link href="/calendar" className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              </AnimatedLink>
+              <AnimatedLink
+                href="/calendar"
+                className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 Calendar
-              </Link>
+              </AnimatedLink>
               {(role === 'SUPER_ADMIN' || role === 'ADMIN') && (
                 <>
-                  <Link href="/employees" className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                  <AnimatedLink
+                    href="/employees"
+                    className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
                     Employees
-                  </Link>
-                  <Link href="/reports" className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                  </AnimatedLink>
+                  <AnimatedLink
+                    href="/reports"
+                    className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
                     Reports
-                  </Link>
+                  </AnimatedLink>
                 </>
               )}
               {role === 'SUPER_ADMIN' && (
-                <Link href="/admins" className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                <AnimatedLink
+                  href="/admins"
+                  className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   Admins
-                </Link>
+                </AnimatedLink>
               )}
             </div>
           </div>

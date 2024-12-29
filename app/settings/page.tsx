@@ -10,6 +10,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { useToast } from '@/components/ui/use-toast'
+import { PageTransition } from '@/components/page-transition'
+import { AnimatedCard } from '@/components/animated-card'
+import { motion } from 'framer-motion'
 
 export default function SettingsPage() {
   const [userProfile, setUserProfile] = useState(null)
@@ -81,46 +84,56 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation role={userProfile.role} user={userProfile} />
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <h1 className="text-3xl font-bold text-primary mb-6">Settings</h1>
-          <Card>
-            <CardHeader>
-              <CardTitle>User Preferences</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="emailNotifications">Email Notifications</Label>
-                  <Switch
-                    id="emailNotifications"
-                    checked={emailNotifications}
-                    onCheckedChange={setEmailNotifications}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="weekStartDay">Week Start Day</Label>
-                  <select
-                    id="weekStartDay"
-                    value={weekStartDay}
-                    onChange={(e) => setWeekStartDay(e.target.value)}
-                    className="w-full p-2 border rounded"
+    <PageTransition>
+      <div className="min-h-screen bg-background">
+        <Navigation role={userProfile.role} user={userProfile} />
+        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div className="px-4 py-6 sm:px-0">
+            <h1 className="text-3xl font-bold text-primary mb-6">Settings</h1>
+            <AnimatedCard>
+              <Card>
+                <CardHeader>
+                  <CardTitle>User Preferences</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <motion.form
+                    onSubmit={handleSubmit}
+                    className="space-y-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
                   >
-                    <option value="Sunday">Sunday</option>
-                    <option value="Monday">Monday</option>
-                  </select>
-                </div>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? 'Saving...' : 'Save Settings'}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="emailNotifications">Email Notifications</Label>
+                      <Switch
+                        id="emailNotifications"
+                        checked={emailNotifications}
+                        onCheckedChange={setEmailNotifications}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="weekStartDay">Week Start Day</Label>
+                      <select
+                        id="weekStartDay"
+                        value={weekStartDay}
+                        onChange={(e) => setWeekStartDay(e.target.value)}
+                        className="w-full p-2 border rounded"
+                      >
+                        <option value="Sunday">Sunday</option>
+                        <option value="Monday">Monday</option>
+                      </select>
+                    </div>
+                    <Button type="submit" disabled={isLoading}>
+                      {isLoading ? 'Saving...' : 'Save Settings'}
+                    </Button>
+                  </motion.form>
+                </CardContent>
+              </Card>
+            </AnimatedCard>
+          </div>
+        </main>
+      </div>
+    </PageTransition>
   )
 }
 

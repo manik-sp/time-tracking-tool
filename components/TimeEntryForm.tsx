@@ -1,60 +1,84 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/use-toast'
-import { differenceInMinutes, addMinutes, format } from 'date-fns'
+import { motion } from 'framer-motion'
 
 export default function TimeEntryForm({ userId }: { userId: string }) {
-  const [description, setDescription] = useState('')
-  const [startTime, setStartTime] = useState('')
-  const [endTime, setEndTime] = useState('')
-  const [duration, setDuration] = useState('')
+  const [client, setClient] = useState('')
+  const [workDate, setWorkDate] = useState('')
+  const [stunden, setStunden] = useState('')
+  const [zmsd, setZmsd] = useState('')
+  const [rate, setRate] = useState('')
+  const [notes, setNotes] = useState('')
+  const [orderNumber, setOrderNumber] = useState('')
+  const [performance, setPerformance] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+
+  const router = useRouter()
   const supabase = createClientComponentClient()
   const { toast } = useToast()
-
-  useEffect(() => {
-    if (startTime && endTime) {
-      const start = new Date(startTime)
-      const end = new Date(endTime)
-      const diff = differenceInMinutes(end, start)
-      setDuration(diff.toString())
-    }
-  }, [startTime, endTime])
-
-  useEffect(() => {
-    if (startTime && duration) {
-      const start = new Date(startTime)
-      const end = addMinutes(start, parseInt(duration))
-      setEndTime(format(end, "yyyy-MM-dd'T'HH:mm"))
-    }
-  }, [startTime, duration])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
-      const { error } = await supabase
-        .from('time_entries')
-        .insert([
-          { user_id: userId, description, start_time: startTime, end_time: endTime },
-        ])
+      const { data: userData } = await supabase
+        .from('user_profiles')
+        .select('name')
+        .eq('id', userId)
+        .single()
 
-      if (error) throw error
+      if (!userData) {
+        throw new Error('User not found')
+      }
+
+      const response = await fetch('/api/time-entries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          employeeName: userData.name,
+          client,
+          workDate,
+          stunden: parseFloat(stunden),
+          zmsd,
+          rate: rate ? parseFloat(rate) : null,
+          notes,
+          orderNumber,
+          performance,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to submit time entry')
+      }
 
       toast({
         title: "Success",
         description: "Time entry saved successfully",
       })
-      setDescription('')
-      setStartTime('')
-      setEndTime('')
-      setDuration('')
+
+      // Reset form fields
+      setClient('')
+      setWorkDate('')
+      setStunden('')
+      setZmsd('')
+      setRate('')
+      setNotes('')
+      setOrderNumber('')
+      setPerformance('')
+
+      router.refresh()
     } catch (error) {
       console.error('Error saving time entry:', error)
       toast({
@@ -68,49 +92,91 @@ export default function TimeEntryForm({ userId }: { userId: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <motion.form
+      onSubmit={handleSubmit}
+      className="space-y-4"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="client">Client</Label>
         <Input
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          id="client"
+          value={client}
+          onChange={(e) => setClient(e.target.value)}
           required
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="startTime">Start Time</Label>
+        <Label htmlFor="workDate">Work Date</Label>
         <Input
-          type="datetime-local"
-          id="startTime"
-          value={startTime}
-          onChange={(e) => setStartTime(e.target.value)}
+          id="workDate"
+          type="date"
+          value={workDate}
+          onChange={(e) => setWorkDate(e.target.value)}
           required
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="endTime">End Time</Label>
+        <Label htmlFor="stunden">Stunden</Label>
         <Input
-          type="datetime-local"
-          id="endTime"
-          value={endTime}
-          onChange={(e) => setEndTime(e.target.value)}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="duration">Duration (minutes)</Label>
-        <Input
+          id="stunden"
           type="number"
-          id="duration"
-          value={duration}
-          onChange={(e) => setDuration(e.target.value)}
-          min="1"
+          step="0.01"
+          min="0.01"
+          value={stunden}
+          onChange={(e) => setStunden(e.target.value)}
+          required
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="zmsd">ZMSD</Label>
+        <Input
+          id="zmsd"
+          value={zmsd}
+          onChange={(e) => setZmsd(e.target.value)}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="rate">Rate (€/st)</Label>
+        <Input
+          id="rate"
+          type="number"
+          step="0.01"
+          min="0"
+          value={rate}
+          onChange={(e) => setRate(e.target.value)}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="orderNumber">Order Number</Label>
+        <Input
+          id="orderNumber"
+          value={orderNumber}
+          onChange={(e) => setOrderNumber(e.target.value)}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="performance">Performance</Label>
+        <Input
+          id="performance"
+          value={performance}
+          onChange={(e) => setPerformance(e.target.value)}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="notes">Notes</Label>
+        <Textarea
+          id="notes"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
         />
       </div>
       <Button type="submit" disabled={isLoading}>
         {isLoading ? 'Saving...' : 'Log Time'}
       </Button>
-    </form>
+    </motion.form>
   )
 }
 
