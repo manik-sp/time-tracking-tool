@@ -1,7 +1,8 @@
+// app/weekly-view/page.tsx
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
-import Navigation from '../components/Navigation'
 import { redirect } from 'next/navigation'
+import Navigation from '@/components/Navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { startOfWeek, endOfWeek, eachDayOfInterval, format } from 'date-fns'
 import { PageTransition } from '@/components/page-transition'
@@ -37,31 +38,27 @@ export default async function WeeklyViewPage() {
   const weekEnd = endOfWeek(today)
   const daysOfWeek = eachDayOfInterval({ start: weekStart, end: weekEnd })
 
+  // Fetch time entries for the current week
   const { data: timeEntries, error: timeEntriesError } = await supabase
     .from('time_entries')
-    .select('*')
+    .select('work_date, stunden')
     .eq('user_id', userProfile.id)
-    .gte('start_time', weekStart.toISOString())
-    .lte('start_time', weekEnd.toISOString())
+    .gte('work_date', weekStart.toISOString())
+    .lte('work_date', weekEnd.toISOString())
 
   if (timeEntriesError) {
     console.error('Error fetching time entries:', timeEntriesError)
   }
 
+  // Group time entries by date
   const groupedEntries = daysOfWeek.map(day => {
     const dayEntries = timeEntries?.filter(entry => 
-      new Date(entry.start_time).toDateString() === day.toDateString()
+      new Date(entry.work_date).toDateString() === day.toDateString()
     ) || []
     return {
       date: day,
       entries: dayEntries,
-      totalHours: dayEntries.reduce((acc, entry) => {
-        if (entry.end_time) {
-          const duration = new Date(entry.end_time).getTime() - new Date(entry.start_time).getTime()
-          return acc + duration / 3600000 // Convert milliseconds to hours
-        }
-        return acc
-      }, 0)
+      totalHours: dayEntries.reduce((acc, entry) => acc + entry.stunden, 0)
     }
   })
 
@@ -83,10 +80,8 @@ export default async function WeeklyViewPage() {
                       <p className="text-2xl font-bold mb-2">{day.totalHours.toFixed(2)} hours</p>
                       <ul className="space-y-2">
                         {day.entries.map((entry) => (
-                          <li key={entry.id} className="text-sm">
-                            {format(new Date(entry.start_time), 'HH:mm')} - {entry.end_time ? format(new Date(entry.end_time), 'HH:mm') : 'Ongoing'}
-                            <br />
-                            {entry.description}
+                          <li key={entry.work_date} className="text-sm">
+                            {entry.stunden}h - {entry.client || 'No client'}
                           </li>
                         ))}
                       </ul>
@@ -101,4 +96,3 @@ export default async function WeeklyViewPage() {
     </PageTransition>
   )
 }
-

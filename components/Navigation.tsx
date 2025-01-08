@@ -1,9 +1,6 @@
-'use client'
-
 import Link from 'next/link'
-import { ThemeToggle } from './theme-toggle'
-import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,9 +10,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { User, Calendar, BarChart2, Settings } from 'lucide-react'
-import { motion } from 'framer-motion'
-
-const AnimatedLink = motion(Link)
 
 const Navigation = ({ role, user }: { role: string; user: { name: string; email: string; avatar_url?: string } }) => {
   return (
@@ -29,64 +23,33 @@ const Navigation = ({ role, user }: { role: string; user: { name: string; email:
               </Link>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <AnimatedLink
-                href="/dashboard"
-                className="border-primary text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
+              <Link href="/dashboard" className="border-primary text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                 Dashboard
-              </AnimatedLink>
-              <AnimatedLink
-                href="/weekly-view"
-                className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Weekly View
-              </AnimatedLink>
-              <AnimatedLink
-                href="/calendar"
-                className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
+              </Link>
+              <Link href="/calendar" className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                 Calendar
-              </AnimatedLink>
+              </Link>
+              <Link href="/weekly-view" className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                Weekly View
+              </Link>
               {(role === 'SUPER_ADMIN' || role === 'ADMIN') && (
                 <>
-                  <AnimatedLink
-                    href="/employees"
-                    className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
+                  <Link href="/employees" className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                     Employees
-                  </AnimatedLink>
-                  <AnimatedLink
-                    href="/reports"
-                    className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
+                  </Link>
+                  <Link href="/reports" className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                     Reports
-                  </AnimatedLink>
+                  </Link>
                 </>
               )}
               {role === 'SUPER_ADMIN' && (
-                <AnimatedLink
-                  href="/admins"
-                  className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
+                <Link href="/admins" className="border-transparent text-muted-foreground hover:border-primary hover:text-primary inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                   Admins
-                </AnimatedLink>
+                </Link>
               )}
             </div>
           </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
-            <ThemeToggle />
+          <div className="hidden sm:ml-6 sm:flex sm:items-center">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -105,10 +68,7 @@ const Navigation = ({ role, user }: { role: string; user: { name: string; email:
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/profile">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </Link>
+                  <Link href="/profile">Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/weekly-view">
@@ -116,19 +76,6 @@ const Navigation = ({ role, user }: { role: string; user: { name: string; email:
                     <span>Weekly View</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/reports">
-                    <BarChart2 className="mr-2 h-4 w-4" />
-                    <span>Reports</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/settings">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/logout">Log out</Link>
                 </DropdownMenuItem>
