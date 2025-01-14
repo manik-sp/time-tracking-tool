@@ -8,48 +8,63 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useToast } from '@/components/ui/use-toast'
+import Link from 'next/link'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [message, setMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const supabase = createClientComponentClient()
+  const { toast } = useToast()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setMessage('')
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       })
 
-      if (error) throw error
+      // Log response for debugging
+      console.log('Response status:', response.status)
+
+      const textData = await response.text()
+      console.log('Raw response:', textData)
+
+      let data
+      try {
+        data = JSON.parse(textData)
+      } catch (parseError) {
+        console.error('Failed to parse response:', parseError)
+        throw new Error('Invalid server response')
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed')
+      }
 
       if (data.user) {
-        // Check if user profile exists, if not create it
-        const { data: profileData, error: profileError } = await supabase
-          .from('user_profiles')
-          .upsert({ 
-            id: data.user.id, 
-            email: data.user.email,
-            name: data.user.user_metadata.name || 'Unknown'
-          }, { onConflict: 'id' })
-          .select()
-          .single()
-
-        if (profileError) throw profileError
-
+        toast({
+          title: 'Success',
+          description: 'Logged in successfully',
+        })
         router.push('/dashboard')
         router.refresh()
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error)
-      setMessage(error.message || 'An error occurred during login')
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to login',
+        variant: 'destructive',
+      })
     } finally {
       setIsLoading(false)
     }
@@ -98,24 +113,18 @@ export default function Login() {
               >
                 {isLoading ? 'Logging In...' : 'Log In'}
               </Button>
+              <div className="text-center mt-4">
+                <p className="text-sm text-muted-foreground">
+                  Don't have an account?{' '}
+                  <Link href="/signup" className="text-primary hover:underline">
+                    Sign up
+                  </Link>
+                </p>
+              </div>
             </form>
-            <AnimatePresence>
-              {message && (
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="mt-4 text-sm text-center text-red-500"
-                >
-                  {message}
-                </motion.p>
-              )}
-            </AnimatePresence>
           </CardContent>
         </Card>
       </motion.div>
     </div>
   )
 }
-

@@ -1,15 +1,21 @@
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  schemas  = ["public", "auth"] // Include both schemas
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"] // Enable the multiSchema feature
 }
 
-model User {
+// Models in the "public" schema
+model UserProfile {
+  @@schema("public") // Specify the schema for this model
   id            String    @id @default(cuid())
-  email         String    @unique
+  user_id       String    @unique // Add @unique for one-to-one relationship
+  user          User      @relation(fields: [user_id], references: [id])
   name          String?
   role          Role      @default(EMPLOYEE)
   avatar_url    String?
@@ -19,19 +25,50 @@ model User {
 }
 
 model TimeEntry {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  startTime   DateTime
-  endTime     DateTime?
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  @@schema("public") // Specify the schema for this model
+  id            String      @id @default(cuid())
+  user_id       String
+  user          UserProfile @relation(fields: [user_id], references: [id])
+  employee_name String
+  client        String
+  work_date     DateTime
+  stunden       Float
+  rate          Float
+  description   String?
+  notes         String?
+  order_number  String?
+  performance   String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
+model Category {
+  @@schema("public") // Specify the schema for this model
+  id    Int    @id @default(autoincrement())
+  name  String
+  color String
+}
+
+model Client {
+  @@schema("public") // Specify the schema for this model
+  id   String @id @default(cuid())
+  name String
+}
+
+// Models in the "auth" schema
+model User {
+  @@schema("auth") // Specify the schema for this model
+  id         String    @id @default(cuid())
+  email      String    @unique
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  profile    UserProfile? // One-to-one relationship
+}
+
+// Enums in the "public" schema
 enum Role {
+  @@schema("public") // Specify the schema for this enum
   SUPER_ADMIN
   ADMIN
   EMPLOYEE
 }
-
